@@ -106,6 +106,7 @@ export class PortfolioPlatformStack extends cdk.Stack {
     // Registro de prueba DynamoDB
     // =========================
     new cr.AwsCustomResource(this, 'SeedPortfolioItem', {
+      // Se ejecuta cuando se crea el recurso.
       onCreate: {
         service: 'DynamoDB',
         action: 'putItem',
@@ -122,6 +123,10 @@ export class PortfolioPlatformStack extends cdk.Stack {
               S: 'Sebastian',
             },
 
+            fecha: {
+              S: '2026-10-07',
+            },
+
             portfolioUrl: {
               S: 'https://example.com/student-001',
             },
@@ -132,6 +137,36 @@ export class PortfolioPlatformStack extends cdk.Stack {
           cr.PhysicalResourceId.of('student-001'),
       },
 
+      // Se ejecuta cuando el recurso se actualiza.
+      // Permite actualizar el registro existente en DynamoDB.
+      onUpdate: {
+        service: 'DynamoDB',
+        action: 'putItem',
+
+        parameters: {
+          TableName: table.tableName,
+
+          Item: {
+            studentId: {
+              S: 'student-001',
+            },
+
+            studentName: {
+              S: 'Sebastian',
+            },
+
+            fecha: {
+              S: '2026-10-07',
+            },
+
+            portfolioUrl: {
+              S: 'https://example.com/student-001',
+            },
+          },
+        },
+      },
+
+      // Permiso mínimo necesario para el registro de prueba.
       policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
         resources: [table.tableArn],
       }),
